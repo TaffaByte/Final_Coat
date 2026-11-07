@@ -41,7 +41,8 @@ namespace FinalCoat{
         float normalMass;
         Vector2 spawnPoint;
         Vector3 bodyBaseScale = Vector3.one;
-        float keyOffsetX;
+        Vector3 keyBaseScale = Vector3.one;
+        float keyTurn;
         readonly List<RaycastHit2D> rayHits = new List<RaycastHit2D>(4);
         ContactFilter2D solidOnly;
         GUIStyle labelStyle;
@@ -54,7 +55,7 @@ namespace FinalCoat{
             Home = spawnPoint;
             solidOnly = new ContactFilter2D { useTriggers = false };
             if (body != null) bodyBaseScale = body.localScale;
-            if (key != null) keyOffsetX = Mathf.Abs(key.localPosition.x);
+            if (key != null) keyBaseScale = key.localScale;
             if (bodyRenderer != null) bodyRenderer.color = activeColor;
             Patrol = new PatrolState(this);
             Chase = new ChaseState(this);
@@ -157,8 +158,8 @@ namespace FinalCoat{
 
         void Animate(){
             if (key != null){
-                key.localPosition = new Vector3(-keyOffsetX * Facing, key.localPosition.y, 0f);
-                key.Rotate(0f, 0f, -KeySpinSpeed * Time.deltaTime);
+                keyTurn += KeySpinSpeed * Time.deltaTime;
+                key.localScale = new Vector3(keyBaseScale.x * Mathf.Cos(keyTurn * Mathf.Deg2Rad), keyBaseScale.y, 1f);
             }
             if (body != null){
                 float speed = Mathf.Abs(Body.GetVelocity().x);
