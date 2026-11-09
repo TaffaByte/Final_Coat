@@ -48,9 +48,11 @@ namespace FinalCoat.EditorTools{
             var props = new GameObject("Props").transform;
             var pickups = new GameObject("Paint").transform;
             var players = new GameObject("Players").transform;
+            var enemies = new GameObject("Enemies").transform;
             BuildLevel(level);
             BuildProps(props);
             BuildPaint(pickups);
+            BuildEnemies(enemies);
             var start = new GameObject("Start Point").transform;
             start.position = new Vector3(-6f, 1f, 0f);
             var p1 = MakeToy(0, new Vector2(-6.6f, 1f), Player1, ControlScheme.WASD, players);
@@ -123,6 +125,12 @@ namespace FinalCoat.EditorTools{
 
         static void BuildProps(Transform parent){
             MakeCrate("Crate (push onto Plate B)", new Vector2(66f, 0.5f), parent);
+        }
+
+        static void BuildEnemies(Transform parent){
+            HelicopterBuilder.Make("Helicopter (climb)", new Vector2(3.5f, 3.5f), parent, 1.5f);
+            HelicopterBuilder.Make("Helicopter (swings)", new Vector2(21.8f, 7.5f), parent, 1.2f);
+            HelicopterBuilder.Make("Helicopter (solo pot)", new Vector2(54f, 5f), parent, 1.3f);
         }
 
         static void BuildPaint(Transform parent){
