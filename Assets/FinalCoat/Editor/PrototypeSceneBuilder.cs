@@ -9,6 +9,7 @@ namespace FinalCoat.EditorTools{
     public static class PrototypeSceneBuilder{
         const string RootFolder = "Assets/FinalCoat";
         const string SpriteFolder = RootFolder + "/Placeholders";
+        const string ArtFolder = RootFolder + "/Art";
         const string SceneFolder = RootFolder + "/Scenes";
         const string ScenePath = SceneFolder + "/Prototype.unity";
         static readonly Color Background = new Color(0.95f, 0.91f, 0.84f);
@@ -25,6 +26,7 @@ namespace FinalCoat.EditorTools{
         static readonly Color Player2 = new Color(0.25f, 0.5f, 0.95f);
         static Sprite square;
         static Sprite circle;
+        static Sprite bot1, bot1Key, bot2, bot2Key, paintBucket, crateArt;
         [MenuItem("Final Coat/Build Prototype Scene")]
         public static void Build(){
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -37,6 +39,7 @@ namespace FinalCoat.EditorTools{
             EnsureFolder(SceneFolder);
             square = MakeSprite("Square", 32, false);
             circle = MakeSprite("Circle", 64, true);
+            if (!LoadArt()) return;
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             var level = new GameObject("Level").transform;
             var props = new GameObject("Props").transform;
@@ -55,8 +58,8 @@ namespace FinalCoat.EditorTools{
             var strand = strandGo.AddComponent<PaintStrand>();
             strand.toyA = p1;
             strand.toyB = p2;
-            MakeWindUp("Wind-up Toy A", new Vector2(18f, 0.4f), 2f, enemies);
-            MakeWindUp("Wind-up Toy B", new Vector2(34f, 0.4f), 2.5f, enemies);
+            MakeWindUp("Wind-up Toy A", new Vector2(18f, 0.6f), 2f, bot1, bot1Key, new Vector2(0.09f, 0.035f), 2f, new Vector2(0.55f, 1.17f), enemies);
+            MakeWindUp("Wind-up Toy B", new Vector2(34f, 0.6f), 2.5f, bot2, bot2Key, new Vector2(0.24f, 0.039f), 2.4f, new Vector2(0.75f, 1.14f), enemies);
             var managers = new GameObject("Game Manager");
             var gm = managers.AddComponent<GameManager>();
             gm.toys = new[] { p1, p2 };
@@ -154,6 +157,27 @@ namespace FinalCoat.EditorTools{
             MakeBlob("Large Blob", new Vector2(38f, 2.2f), BlobKind.Large, 50, LargeBlob, 0.75f, parent);
         }
 
+        static bool LoadArt(){
+            bot1 = Art("Enemies/bot1");
+            bot1Key = Art("Enemies/bot1_key");
+            bot2 = Art("Enemies/bot2");
+            bot2Key = Art("Enemies/bot2_key");
+            paintBucket = Art("Props/paint_bucket");
+            crateArt = Art("Props/crate");
+            var all = new[] { bot1, bot1Key, bot2, bot2Key, paintBucket, crateArt };
+            if (all.Any(s => s == null)){
+                Debug.LogError("Final Coat: some art is missing from " + ArtFolder + ". Check the file names.");
+                return false;
+            }
+            return true;
+        }
+
+        static Sprite Art(string name){
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{ArtFolder}/{name}.png");
+            if (sprite == null) Debug.LogError("Final Coat: missing art " + name);
+            return sprite;
+        }
+
         static ToyController MakeToy(int index, Vector2 position, Color paint, ControlScheme controls, Transform parent){
             var go = new GameObject($"Player {index + 1}");
             go.transform.SetParent(parent, false);
@@ -184,7 +208,7 @@ namespace FinalCoat.EditorTools{
             return toy;
         }
 
-        static void MakeWindUp(string name, Vector2 position, float patrolDistance, Transform parent){
+        static void MakeWindUp(string name, Vector2 position, float patrolDistance, Sprite bodyArt, Sprite keyArt, Vector2 keyOffset, float scale, Vector2 colliderSize, Transform parent){
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
             go.transform.position = position;
@@ -193,23 +217,25 @@ namespace FinalCoat.EditorTools{
             rb.gravityScale = 2.5f;
             rb.freezeRotation = true;
             var col = go.AddComponent<BoxCollider2D>();
-            col.size = new Vector2(1f, 0.7f);
+            col.size = colliderSize;
             var body = new GameObject("Body").transform;
             body.SetParent(go.transform, false);
-            var bodySr = Shape("Shell", square, body, Vector2.zero, new Vector2(1f, 0.7f), Color.white, 10);
-            Shape("Eye", circle, body, new Vector2(0.3f, 0.12f), new Vector2(0.22f, 0.22f), Color.white, 11);
-            Shape("Pupil", circle, body, new Vector2(0.34f, 0.12f), new Vector2(0.1f, 0.1f), Outline, 12);
-            Shape("Wheel L", circle, body, new Vector2(-0.3f, -0.38f), new Vector2(0.24f, 0.24f), Outline, 11);
-            Shape("Wheel R", circle, body, new Vector2(0.3f, -0.38f), new Vector2(0.24f, 0.24f), Outline, 11);
+            body.localScale = new Vector3(-scale, scale, 1f);
+            var bodySr = body.gameObject.AddComponent<SpriteRenderer>();
+            bodySr.sprite = bodyArt;
+            bodySr.sortingOrder = 10;
             var key = new GameObject("Wind-up Key").transform;
-            key.SetParent(go.transform, false);
-            key.localPosition = new Vector3(-0.62f, 0.1f, 0f);
-            Shape("Key Bar", square, key, Vector2.zero, new Vector2(0.1f, 0.5f), new Color(0.8f, 0.65f, 0.3f), 9);
-            Shape("Key Grip", circle, key, new Vector2(0f, 0.25f), new Vector2(0.22f, 0.22f), new Color(0.8f, 0.65f, 0.3f), 9);
+            key.SetParent(body, false);
+            key.localPosition = keyOffset;
+            var keySr = key.gameObject.AddComponent<SpriteRenderer>();
+            keySr.sprite = keyArt;
+            keySr.sortingOrder = 11;
             var enemy = go.AddComponent<WindUpToy>();
             enemy.body = body;
             enemy.key = key;
             enemy.bodyRenderer = bodySr;
+            enemy.activeColor = Color.white;
+            enemy.woundDownColor = new Color(0.6f, 0.6f, 0.6f);
             enemy.patrolDistance = patrolDistance;
         }
 
@@ -225,13 +251,8 @@ namespace FinalCoat.EditorTools{
             trigger.radius = size * 0.6f;
             var visual = new GameObject("Visual").transform;
             visual.SetParent(go.transform, false);
-            if (kind == BlobKind.SoloPot){
-                Shape("Pot", square, visual, new Vector2(0f, -0.1f), new Vector2(size, size * 0.75f), Outline, 7);
-                Shape("Paint", circle, visual, new Vector2(0f, 0.18f), new Vector2(size * 0.9f, size * 0.55f), color, 8);
-            }
-            else{
-                Shape("Drop", circle, visual, Vector2.zero, new Vector2(size, size), color, 8);
-            }
+            if (kind == BlobKind.SoloPot) Shape("Bucket", paintBucket, visual, Vector2.zero, Vector2.one * size * 1.4f, Color.white, 8);
+            else Shape("Drop", circle, visual, Vector2.zero, new Vector2(size, size), color, 8);
             var blob = go.AddComponent<PaintBlob>();
             blob.kind = kind;
             blob.value = value;
@@ -241,8 +262,13 @@ namespace FinalCoat.EditorTools{
         }
 
         static void MakeCrate(string name, Vector2 position, Transform parent){
-            var crate = Box(name, position, Vector2.one, Crate, parent, 4);
-            Shape("Lid", square, crate.transform, new Vector2(0f, 0.4f), new Vector2(1f, 0.12f), Shelf, 5);
+            var crate = new GameObject(name);
+            crate.transform.SetParent(parent, false);
+            crate.transform.position = position;
+            var sr = crate.AddComponent<SpriteRenderer>();
+            sr.sprite = crateArt;
+            sr.sortingOrder = 4;
+            crate.AddComponent<BoxCollider2D>().size = new Vector2(0.93f, 0.93f);
             var rb = crate.AddComponent<Rigidbody2D>();
             rb.mass = 1f;
             rb.gravityScale = 2.5f;
@@ -255,11 +281,13 @@ namespace FinalCoat.EditorTools{
             go.transform.position = new Vector3(-4f, 2f, -10f);
             var cam = go.AddComponent<Camera>();
             cam.orthographic = true;
-            cam.orthographicSize = 6f;
+            cam.orthographicSize = 4.5f;
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = Background;
             go.AddComponent<AudioListener>();
-            go.AddComponent<CameraFollow>();
+            var follow = go.AddComponent<CameraFollow>();
+            follow.minSize = 4f;
+            follow.maxSize = 6.5f;
         }
 
         static GameObject Box(string name, Vector2 center, Vector2 size, Color color, Transform parent, int order = 0, bool withCollider = true){
