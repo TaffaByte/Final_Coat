@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace FinalCoat{
-    // Pressed while any toy or crate (a dynamic Rigidbody2D) rests on it.
-    // Polls with an overlap query so it still works when resting bodies fall asleep.
     public class PressurePlate : MonoBehaviour{
         public PuzzleGate[] gates;
         public Transform button;

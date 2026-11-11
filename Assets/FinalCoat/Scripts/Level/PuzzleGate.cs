@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace FinalCoat{
-    // A solid gate that is open while at least one linked PressurePlate is pressed.
     [RequireComponent(typeof(BoxCollider2D))]
     public class PuzzleGate : MonoBehaviour{
         public SpriteRenderer sprite;
@@ -25,7 +24,6 @@ namespace FinalCoat{
 
         void Update(){
             bool want = holders.Count > 0;
-            // Never close on top of a toy or crate standing in the doorway.
             if (!want && IsOpen && Blocked()) want = true;
             if (want != IsOpen) Apply(want);
         }

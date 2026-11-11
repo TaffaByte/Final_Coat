@@ -12,10 +12,9 @@ namespace FinalCoat.EditorTools{
         const string SceneFolder = RootFolder + "/Scenes";
         const string ScenePath = SceneFolder + "/Level2.unity";
 
-        // ---- Tuning knobs for the swinging platforms ----
         const float SwingLength = 5.6f;
-        const float SwingAngle = 0.35f;   // radians, about +/-1.9 units of sideways travel
-        const float SwingPeriod = 3.4f;   // seconds
+        const float SwingAngle = 0.35f;
+        const float SwingPeriod = 3.4f;
         const float SwingWidth = 2f;
 
         static readonly Color Background = new Color(0.95f, 0.91f, 0.84f);
@@ -68,7 +67,6 @@ namespace FinalCoat.EditorTools{
             gm.strand = strand;
             gm.startPoint = start;
             managers.AddComponent<PrototypeHUD>();
-            // Last level: no NextLevelLoader. Add one and set its scene name to chain another level.
             MakeCamera();
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddToBuildSettings(ScenePath);
@@ -76,38 +74,25 @@ namespace FinalCoat.EditorTools{
             Debug.Log("Final Coat: level 2 built at " + ScenePath + ". Press Play.");
         }
 
-        // ------------------------------------------------------------------
-        // Layout (x runs left to right, y values are SURFACE heights):
-        //   Climb   x -8..16   floor, then steps rising 1.8 each to a ledge at y 5.4
-        //   Swing   x 16..34   three swinging platforms over a pit
-        //   Descent x 34..47   landing ledge, then steps back down
-        //   Puzzle  x 47..86   plate + gate puzzle, crate puzzle, exit
-        // ------------------------------------------------------------------
         static void BuildLevel(Transform parent){
             Box("Wallpaper", new Vector2(40f, 6f), new Vector2(110f, 30f), WallPaper, parent, -20, false);
-            Box("Floor 1", new Vector2(2f, -1f), new Vector2(20f, 2f), Floor, parent);        // x -8..12
-            Box("Floor 2", new Vector2(66.75f, -1f), new Vector2(38.5f, 2f), Floor, parent);  // x 47.5..86
+            Box("Floor 1", new Vector2(2f, -1f), new Vector2(20f, 2f), Floor, parent);
+            Box("Floor 2", new Vector2(66.75f, -1f), new Vector2(38.5f, 2f), Floor, parent);
             Box("Left Wall", new Vector2(-8.5f, 6f), new Vector2(1f, 16f), Floor, parent);
             Box("Right Wall", new Vector2(86.5f, 6f), new Vector2(1f, 16f), Floor, parent);
-            // Climb: every step is 1.8 up, well inside the ~3.2 jump height.
             Ledge("Step 1", 7f, 1.8f, 3f, parent);
             Ledge("Step 2", 10.5f, 3.6f, 3f, parent);
-            Ledge("Swing Start Ledge", 14f, 5.4f, 3f, parent);                                  // x 12.5..15.5
-            // Swinging platforms. Neighbours are in antiphase so they approach each other in turn.
+            Ledge("Swing Start Ledge", 14f, 5.4f, 3f, parent);
             MakeSwing("Swing 1", 18.8f, 5.4f, 0f, parent);
             MakeSwing("Swing 2", 24.8f, 5.4f, Mathf.PI, parent);
             MakeSwing("Swing 3", 30.8f, 5.4f, 0f, parent);
-            Ledge("Swing End Ledge", 36.85f, 5.4f, 5.3f, parent);                               // x 34.2..39.5
-            // Descent
+            Ledge("Swing End Ledge", 36.85f, 5.4f, 5.3f, parent);
             Ledge("Down Step 1", 42f, 3.6f, 3f, parent);
             Ledge("Down Step 2", 45.5f, 1.8f, 3f, parent);
-            // Solo ledge above plate A: the pot is only collectable with the strand snapped.
             Ledge("Solo Ledge", 54f, 2.8f, 2f, parent);
-            // Strand puzzle 1: two plates, one gate.
             var gate1 = MakeGate("Gate 1", new Vector2(58f, 3.25f), new Vector2(0.8f, 6.5f), parent);
             MakePlate("Plate A (left of gate 1)", new Vector2(50f, 0f), parent, gate1);
             MakePlate("Plate A2 (right of gate 1)", new Vector2(62f, 0f), parent, gate1);
-            // Puzzle 2: push the crate onto the plate against the gate.
             var gate2 = MakeGate("Gate 2", new Vector2(75f, 3.25f), new Vector2(0.8f, 6.5f), parent);
             MakePlate("Plate B (crate plate)", new Vector2(73.6f, 0f), parent, gate2);
             MakeCheckpoint(new Vector2(14.2f, 1f + 5.4f), parent);
@@ -134,17 +119,12 @@ namespace FinalCoat.EditorTools{
         }
 
         static void BuildPaint(Transform parent){
-            // Start floor
             Blob(-4f, 0.6f, parent); Blob(-2.5f, 0.6f, parent); Blob(-1f, 0.6f, parent); Blob(3f, 0.6f, parent);
-            // Climb
             Blob(7f, 2.4f, parent); Blob(10.5f, 4.2f, parent);
             MakeBlob("Large Blob", new Vector2(10.5f, 6.5f), BlobKind.Large, 50, LargeBlob, 0.75f, parent);
-            // Swing section: small blobs above each platform, a large one that needs a jump from Swing 2
             Blob(18.8f, 6.3f, parent); Blob(24.8f, 6.3f, parent); Blob(30.8f, 6.3f, parent);
             MakeBlob("Large Blob", new Vector2(24.8f, 8.7f), BlobKind.Large, 50, LargeBlob, 0.75f, parent);
-            // Landing and descent
             Blob(35.5f, 6.3f, parent); Blob(37.5f, 6.3f, parent); Blob(42f, 4.3f, parent); Blob(45.5f, 2.5f, parent);
-            // Puzzle area
             Blob(52f, 0.6f, parent);
             MakeBlob("Solo Paint Pot", new Vector2(54f, 3.55f), BlobKind.SoloPot, 75, SoloPot, 0.7f, parent);
             Blob(56f, 0.6f, parent); Blob(60f, 0.6f, parent); Blob(64f, 0.6f, parent);
@@ -218,7 +198,6 @@ namespace FinalCoat.EditorTools{
             exit.AddComponent<LevelExit>().door = door;
         }
 
-        // ---- Helpers copied from PrototypeSceneBuilder so the two builders stay independent ----
         static ToyController MakeToy(int index, Vector2 position, Color paint, ControlScheme controls, Transform parent){
             var go = new GameObject($"Player {index + 1}");
             go.transform.SetParent(parent, false);

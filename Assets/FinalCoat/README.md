@@ -64,3 +64,8 @@ All paint numbers (hit losses, fall losses, stage thresholds) are on the **Game 
 - Tune the seesaw, ball and crate physics
 - Sprite animations
 - 3 to 4 players
+
+## Asset credits
+
+- Furniture (chair, tables, seesaw, ladder, bookshelf, coat rack, dressers): [2D Side-Scroller Furniture Spritesheet](https://drmonkeystein.itch.io/2d-side-scroller-town-spritesheet) by Monkeystein Studios. The author allows free use ("You can use these however you please"). The seesaw and ladder are cut and rearranged from the pack's table.
+- Wallpaper: made by the team in Canva.

@@ -2,16 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace FinalCoat{
-    // A platform hanging from a rope that swings like a pendulum but stays level.
-    // Kinematic, so it ignores toy friction; riders standing on it are carried along.
     [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
     public class SwingingPlatform : MonoBehaviour{
         [Header("Pendulum")]
         public Vector2 anchor;
         public float ropeLength = 5.6f;
-        public float maxAngle = 0.35f;   // radians
-        public float period = 3.4f;      // seconds per full swing
-        public float phase;              // radians, offsets neighbours
+        public float maxAngle = 0.35f;
+        public float period = 3.4f;
+        public float phase;
         [Header("Visuals")]
         public Transform rope;
         public float ropeWidth = 0.08f;
@@ -33,7 +31,6 @@ namespace FinalCoat{
             rb.position = start;
         }
 
-        // The point where the rope meets the platform is the top centre.
         Vector2 CenterAt(float time){
             float angle = maxAngle * Mathf.Sin(time * Mathf.PI * 2f / period + phase);
             Vector2 top = anchor + new Vector2(Mathf.Sin(angle), -Mathf.Cos(angle)) * ropeLength;
@@ -58,7 +55,7 @@ namespace FinalCoat{
                 var body = c.attachedRigidbody;
                 if (body == null || body == rb || body.bodyType != RigidbodyType2D.Dynamic) continue;
                 if (!riders.Add(body)) continue;
-                if (body.GetVelocity().y > 1f) continue; // jumping off, don't drag
+                if (body.GetVelocity().y > 1f) continue;
                 body.position += delta;
             }
         }

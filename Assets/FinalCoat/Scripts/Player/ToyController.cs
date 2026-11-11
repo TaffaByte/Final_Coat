@@ -42,6 +42,7 @@ namespace FinalCoat{
         float tugPressTime;
         float invulnerableUntil;
         Vector3 visualBaseScale = Vector3.one;
+        float squash;
         SpriteRenderer[] visualRenderers;
         readonly List<Collider2D> overlapResults = new List<Collider2D>(8);
         ContactFilter2D solidOnly;
@@ -122,13 +123,17 @@ namespace FinalCoat{
                     v.x = Mathf.MoveTowards(v.x, 0f, groundDeceleration * dt);
                 }
             }
-            if (jumpPressed && IsGrounded && !IsHolding) v.y = jumpVelocity;
+            if (jumpPressed && IsGrounded && !IsHolding){
+                v.y = jumpVelocity;
+                squash = 0.25f;
+            }
             jumpPressed = false;
             Body.gravityScale = v.y < 0f ? baseGravity * fallGravityMultiplier : baseGravity;
             Body.SetVelocity(v);
         }
 
         void CheckGround(){
+            bool wasGrounded = IsGrounded;
             Bounds b = box.bounds;
             Vector2 center = new Vector2(b.center.x, b.min.y - 0.04f);
             Vector2 size = new Vector2(b.size.x * 0.85f, 0.08f);
@@ -141,6 +146,7 @@ namespace FinalCoat{
                     break;
                 }
             }
+            if (IsGrounded && !wasGrounded && Body.GetVelocity().y <= 0.1f) squash = -0.22f;
         }
 
         public void TakeHit(Vector2 fromPosition){
@@ -151,6 +157,7 @@ namespace FinalCoat{
             away.x = Mathf.Abs(away.x) < 0.01f ? Facing * -1f : away.x;
             away.y = Mathf.Max(away.y, 0.6f);
             Body.SetVelocity(away.normalized * knockbackSpeed);
+            squash = -0.3f;
             gm.OnToyHit(this);
         }
 
@@ -163,7 +170,12 @@ namespace FinalCoat{
 
         void AnimateVisual(){
             if (visual == null) return;
-            visual.localScale = new Vector3(visualBaseScale.x * Facing, visualBaseScale.y, 1f);
+            squash = Mathf.MoveTowards(squash, 0f, Time.deltaTime * 1.5f);
+            float s = IsHolding ? -0.15f : squash;
+            bool running = IsGrounded && Mathf.Abs(moveInput) > 0.01f;
+            float wobble = running ? Mathf.Sin(Time.time * 18f) * 0.05f : Mathf.Sin(Time.time * 3f) * 0.02f;
+            visual.localScale = new Vector3(visualBaseScale.x * (1f - s) * Facing, visualBaseScale.y * (1f + s + wobble), 1f);
+            visual.localRotation = Quaternion.Euler(0f, 0f, IsGrounded ? 0f : -moveInput * 8f);
             if (visualRenderers != null){
                 bool show = !IsInvulnerable || Mathf.Repeat(Time.time, 0.2f) < 0.1f;
                 foreach (var r in visualRenderers) r.enabled = show;

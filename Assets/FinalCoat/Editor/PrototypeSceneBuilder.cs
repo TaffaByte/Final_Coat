@@ -68,6 +68,7 @@ namespace FinalCoat.EditorTools{
             managers.AddComponent<PrototypeHUD>();
             managers.AddComponent<NextLevelLoader>().nextSceneName = "Level2";
             MakeCamera();
+            Level1.Apply();
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddToBuildSettings(ScenePath);
             Selection.activeGameObject = managers;

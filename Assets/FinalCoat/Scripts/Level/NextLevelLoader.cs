@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace FinalCoat{
-    // Put on the Game Manager object. After the level is completed, loads nextSceneName.
-    // Leave nextSceneName empty on the last level.
     public class NextLevelLoader : MonoBehaviour{
         public string nextSceneName = "Level2";
         public float delay = 4f;
