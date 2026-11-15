@@ -181,9 +181,14 @@ namespace FinalCoat{
                     fontStyle = FontStyle.Bold,
                     fontSize = 13
                 };
-                labelStyle.normal.textColor = new Color(0.15f, 0.15f, 0.2f);
+                labelStyle.normal.textColor = Color.white;
             }
-            GUI.Label(new Rect(screen.x - 80f, Screen.height - screen.y - 12f, 160f, 24f), Current.Name, labelStyle);
+            Vector2 size = labelStyle.CalcSize(new GUIContent(Current.Name));
+            var box = new Rect(screen.x - size.x * 0.5f - 8f, Screen.height - screen.y - 12f, size.x + 16f, 24f);
+            GUI.color = new Color(0f, 0f, 0f, 0.7f);
+            GUI.DrawTexture(box, Texture2D.whiteTexture);
+            GUI.color = Color.white;
+            GUI.Label(box, Current.Name, labelStyle);
         }
 
         void OnDrawGizmosSelected(){

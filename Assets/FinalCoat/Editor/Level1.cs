@@ -31,6 +31,8 @@ namespace FinalCoat.EditorTools{
             }
             var old = level.transform.Find("Furniture");
             if (old != null) Undo.DestroyObjectImmediate(old.gameObject);
+            var windows = level.transform.Find("Windows");
+            if (windows != null) Undo.DestroyObjectImmediate(windows.gameObject);
             var root = new GameObject("Furniture");
             Undo.RegisterCreatedObjectUndo(root, "Level 1");
             root.transform.SetParent(level.transform, false);
@@ -149,12 +151,13 @@ namespace FinalCoat.EditorTools{
             Vector2 up = Quaternion.Euler(0f, 0f, lean) * Vector2.up;
             var ladder = Place("Ladder", art, foot + up * height * 0.5f, 1);
             ladder.transform.rotation = Quaternion.Euler(0f, 0f, lean);
+            ladder.gameObject.AddComponent<LadderClimb>();
             Undo.RecordObject(exit, "Level 1");
-            exit.position = new Vector3(foot.x + 0.4f, b.max.y + 1.25f, 0f);
+            exit.position = new Vector3(foot.x + 0.7f, b.max.y + 1.25f, 0f);
             var trigger = exit.GetComponent<BoxCollider2D>();
             if (trigger != null){
                 Undo.RecordObject(trigger, "Level 1");
-                trigger.size = new Vector2(2.6f, 2.5f);
+                trigger.size = new Vector2(2.4f, 2.5f);
             }
             var levelExit = exit.GetComponent<LevelExit>();
             if (levelExit != null){
@@ -162,7 +165,7 @@ namespace FinalCoat.EditorTools{
                 levelExit.door = null;
             }
             foreach (var sr in exit.GetComponentsInChildren<SpriteRenderer>()) Hide(sr);
-            var shelfArt = Art("bookshelf");
+            var shelfArt = Art("bookshelf_walnut");
             Vector2 shelfSize = shelfArt.bounds.size;
             var wall = Box(level, "Right Wall");
             float wallLeft = wall != null ? Measure(wall).min.x : b.max.x;
@@ -177,10 +180,10 @@ namespace FinalCoat.EditorTools{
         }
 
         public static int UsePaintbrushes(){
-            var small = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/FinalCoat/Art/Props/paintbrush_blue.png");
-            var large = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/FinalCoat/Art/Props/paintbrush_red.png");
+            var small = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/FinalCoat/Art/Props/paintbrush_green.png");
+            var large = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/FinalCoat/Art/Props/paintbrush_gold.png");
             if (small == null || large == null){
-                Debug.LogError("Final Coat: missing Art/Props/paintbrush_blue.png or paintbrush_red.png");
+                Debug.LogError("Final Coat: missing Art/Props/paintbrush_green.png or paintbrush_gold.png");
                 return 0;
             }
             int swapped = 0;

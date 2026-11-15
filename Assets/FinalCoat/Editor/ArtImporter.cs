@@ -19,12 +19,14 @@ namespace FinalCoat.EditorTools{
         };
         static readonly Dictionary<string, float> FurniturePixelsPerUnit = new Dictionary<string, float>{
             { "seesaw_plank", 8f },
+            { "seesaw_plank_cream", 8f },
             { "table_leg_bead", 8f },
             { "ladder", 8f }
         };
         static readonly Dictionary<string, Vector4> FurnitureBorders = new Dictionary<string, Vector4>{
             { "tabletop", new Vector4(3f, 0f, 3f, 0f) },
-            { "seesaw_plank", new Vector4(4f, 0f, 4f, 0f) }
+            { "seesaw_plank", new Vector4(4f, 0f, 4f, 0f) },
+            { "seesaw_plank_cream", new Vector4(4f, 0f, 4f, 0f) }
         };
         void OnPreprocessTexture(){
             if (!assetPath.StartsWith(ArtFolder)) return;
