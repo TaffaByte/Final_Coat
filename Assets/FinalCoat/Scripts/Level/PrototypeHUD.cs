@@ -73,7 +73,7 @@ namespace FinalCoat{
                 GUI.Label(r, notice, centered);
             }
             if (showControls) DrawControls();
-            if (gm.IsPaused) DrawOverlay("PAUSED", "Esc  resume     R  restart");
+            if (gm.IsPaused) DrawOverlay("PAUSED", "Esc / Start  resume     R / Y  restart");
             if (gm.IsLevelComplete) DrawLevelComplete(gm);
         }
 
@@ -104,9 +104,9 @@ namespace FinalCoat{
 
         void DrawControls(){
             string text =
-                "P1: A / D move,  W jump,  S hold on,  Left Shift strand\n" +
-                "P2: Arrows move,  Up jump,  Down hold on,  Right Shift strand\n" +
-                "Strand button: tap = tug, hold 1s = snap, tap near partner = rejoin.   Esc pause,  F1 hide help";
+                "P1: A / D move,  W jump,  S hold on,  Left Shift strand   (or controller 1)\n" +
+                "P2: Arrows move,  Up jump,  Down hold on,  Right Shift strand   (or controller 2)\n" +
+                "Controller: stick move, A jump, B hold on, X strand.   Esc / Start pause,  F1 hide help";
             var r = new Rect(16f, Screen.height - 76f, Screen.width - 32f, 62f);
             Fill(r, new Color(0f, 0f, 0f, 0.5f));
             GUI.Label(new Rect(r.x + 10f, r.y + 6f, r.width - 20f, r.height - 12f), text, body);
