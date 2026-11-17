@@ -687,11 +687,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
-  cloudProjectId: ca61ca15-fa98-4e05-a752-678c8b15f5a8
+  cloudProjectId: 937764ae-6158-4629-9b45-1f3e06e5a8a6
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: Final_Coat (1)
-  organizationId: eatdemskittlesboi
+  projectName: Final_Coat
+  organizationId: unity_f588665f2f74207f69bb
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
