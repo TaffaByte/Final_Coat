@@ -15,6 +15,7 @@ namespace FinalCoat.EditorTools{
         const float LedgeWidth = 7.6f;
         const string BucketPath = "Assets/FinalCoat/Art/Props/paint_bucket.png";
         const int WindowOrder = -15;
+        const float BookshelfOpacity = 0.8f;
         static readonly float[] WindowX = { 97.3f };
         static readonly string[] LedgeNames = { "Step 1", "Step 2", "Swing Start Ledge", "Swing End Ledge", "Down Step 1", "Down Step 2", "Solo Ledge" };
         static readonly string[] SwingNames = { "Swing 1", "Swing 2", "Swing 3" };
@@ -145,7 +146,20 @@ namespace FinalCoat.EditorTools{
             float shelfRow = 115f;
             var sr = Place("Bookshelf", art, new Vector2(b.center.x, b.max.y + (shelfRow - art.rect.height * 0.5f) * perPixel), -10);
             sr.transform.localScale = new Vector3(scale, scale, 1f);
+            sr.color = new Color(1f, 1f, 1f, BookshelfOpacity);
             Hide(floor);
+            AddShelfEdge(level, "Shelf Edge Right", b.max.x + 0.15f, b.max.y, 3.1f);
+        }
+
+        static void AddShelfEdge(Transform level, string name, float x, float bottom, float height){
+            var old = level.Find(name);
+            if (old != null) Undo.DestroyObjectImmediate(old.gameObject);
+            var go = new GameObject(name);
+            Undo.RegisterCreatedObjectUndo(go, "Level 2 Art");
+            go.transform.SetParent(level, false);
+            go.transform.position = new Vector3(x, bottom + height * 0.5f, 0f);
+            var col = go.AddComponent<BoxCollider2D>();
+            col.size = new Vector2(0.3f, height);
         }
 
         static void AddArrivalLadder(){

@@ -39,7 +39,7 @@ namespace FinalCoat.EditorTools{
             importer.spritePixelsPerUnit = 256;
             importer.mipmapEnabled = false;
             importer.alphaIsTransparency = true;
-            importer.filterMode = background || fileName.StartsWith("paintbrush") ? FilterMode.Bilinear : FilterMode.Point;
+            importer.filterMode = background || fileName.StartsWith("paintbrush") || fileName.StartsWith("logo") ? FilterMode.Bilinear : FilterMode.Point;
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             if (furniture){
                 float ppu;

@@ -4,6 +4,8 @@ namespace FinalCoat{
     public class PrototypeHUD : MonoBehaviour{
         public bool showControls = true;
         public float noticeDuration = 3f;
+        public string completeTitle = "LEVEL COMPLETE";
+        public string completeMessage = "";
         string notice;
         float noticeUntil;
         bool strandSnapped;
@@ -119,11 +121,15 @@ namespace FinalCoat{
         }
 
         void DrawLevelComplete(GameManager gm){
+            if (!string.IsNullOrEmpty(completeMessage)){
+                DrawOverlay(completeTitle, completeMessage);
+                return;
+            }
             int leader = gm.LeaderIndex();
             string result = leader < 0
                 ? "It's a tie! Nobody gets the final coat... yet"
                 : $"Player {leader + 1} is the most painted toy with {gm.GetScore(leader)} paint!";
-            DrawOverlay("LEVEL COMPLETE", result + "\nPress R to play again");
+            DrawOverlay(completeTitle, result + "\nPress R to play again");
         }
     }
 }

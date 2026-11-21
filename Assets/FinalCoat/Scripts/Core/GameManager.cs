@@ -21,7 +21,8 @@ namespace FinalCoat{
         float lastTeamFallTime = -10f;
         public bool IsPaused { get; private set; }
         public bool IsLevelComplete { get; private set; }
-        public bool InputLocked => IsPaused || IsLevelComplete;
+        public bool InMenu { get; set; }
+        public bool InputLocked => IsPaused || IsLevelComplete || InMenu;
         public bool IsSolo => strand == null || strand.IsSnapped;
         public int StageCount => stageThresholds.Length;
         void Awake(){
@@ -39,6 +40,34 @@ namespace FinalCoat{
         void Start(){
             for (int i = 0; i < toys.Length; i++)
                 GameEvents.RaiseScoreChanged(i, 0);
+            if (GameSettings.DropInNextScene){
+                GameSettings.DropInNextScene = false;
+                DropToys(9f);
+                gameObject.AddComponent<ScreenFade>();
+            }
+        }
+
+        public void DropToys(float height){
+            var follow = FindFirstObjectByType<CameraFollow>();
+            if (follow != null){
+                Vector2 center = Vector2.zero;
+                int count = 0;
+                foreach (var toy in toys){
+                    if (toy == null) continue;
+                    center += (Vector2)toy.transform.position;
+                    count++;
+                }
+                if (count > 0) follow.SnapTo(center / count);
+                follow.Hold(1.2f);
+            }
+            foreach (var toy in toys){
+                if (toy == null) continue;
+                toy.transform.position += Vector3.up * height;
+                if (toy.Body != null){
+                    toy.Body.position = toy.transform.position;
+                    toy.Body.SetVelocity(Vector2.zero);
+                }
+            }
         }
 
         void OnDestroy(){
@@ -46,6 +75,7 @@ namespace FinalCoat{
         }
 
         void Update(){
+            if (InMenu) return;
             if (ToyInput.PausePressed && !IsLevelComplete) SetPaused(!IsPaused);
             if (ToyInput.RestartPressed && (IsPaused || IsLevelComplete)) Restart();
         }

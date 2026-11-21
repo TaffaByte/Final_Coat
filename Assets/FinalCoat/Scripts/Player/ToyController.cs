@@ -8,6 +8,7 @@ namespace FinalCoat{
         public int playerIndex;
         public ControlScheme controls;
         public Color paintColor = Color.red;
+        public bool useSavedColour = true;
         public Transform visual;
         [Header("Running")]
         public float moveSpeed = 7f;
@@ -47,6 +48,7 @@ namespace FinalCoat{
         readonly List<Collider2D> overlapResults = new List<Collider2D>(8);
         ContactFilter2D solidOnly;
         void Awake(){
+            if (useSavedColour) UseSavedColour();
             Body = GetComponent<Rigidbody2D>();
             box = GetComponent<BoxCollider2D>();
             Body.freezeRotation = true;
@@ -60,6 +62,13 @@ namespace FinalCoat{
                 visualBaseScale = visual.localScale;
                 visualRenderers = visual.GetComponentsInChildren<SpriteRenderer>();
             }
+        }
+
+        public void UseSavedColour(){
+            paintColor = GameSettings.GetColour(playerIndex);
+            if (visual == null) return;
+            var dot = visual.Find("Player Dot");
+            if (dot != null && dot.TryGetComponent(out SpriteRenderer dotRenderer)) dotRenderer.color = paintColor;
         }
 
         void Update(){

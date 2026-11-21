@@ -29,6 +29,7 @@ namespace FinalCoat{
         public static bool RestartPressed => KeyPressed(RawKey.R) || AnyPad(false);
         static int PadIndex(ControlScheme scheme) => scheme == ControlScheme.Arrows ? 1 : 0;
         public static bool HelpPressed => KeyPressed(RawKey.F1);
+        public static bool BackPressed => KeyPressed(RawKey.Escape) || AnyPadBack();
         static RawKey Map(ControlScheme scheme, GameKey key){
             if (scheme == ControlScheme.WASD){
                 switch (key){
@@ -89,6 +90,12 @@ namespace FinalCoat{
             return pad != null && PadKey(pad, key).wasReleasedThisFrame;
         }
 
+        static bool AnyPadBack(){
+            foreach (var pad in Gamepad.all)
+                if (pad.buttonEast.wasPressedThisFrame) return true;
+            return false;
+        }
+
         static bool AnyPad(bool start){
             foreach (var pad in Gamepad.all){
                 var button = start ? pad.startButton : pad.buttonNorth;
@@ -136,6 +143,7 @@ namespace FinalCoat{
         static bool PadPressed(int index, GameKey key) => false;
         static bool PadReleased(int index, GameKey key) => false;
         static bool AnyPad(bool start) => false;
+        static bool AnyPadBack() => false;
         static KeyCode ToKeyCode(RawKey key){
             switch (key){
                 case RawKey.A: return KeyCode.A;

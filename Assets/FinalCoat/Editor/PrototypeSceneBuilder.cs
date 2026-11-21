@@ -24,9 +24,9 @@ namespace FinalCoat.EditorTools{
         static readonly Color SoloPot = new Color(0.65f, 0.3f, 0.85f);
         static readonly Color Player1 = new Color(0.93f, 0.3f, 0.3f);
         static readonly Color Player2 = new Color(0.25f, 0.5f, 0.95f);
-        static Sprite square;
-        static Sprite circle;
-        static Sprite bot1, bot1Key, bot2, bot2Key, paintBucket, crateArt;
+        internal static Sprite square;
+        internal static Sprite circle;
+        internal static Sprite bot1, bot1Key, bot2, bot2Key, paintBucket, crateArt;
         [MenuItem("Final Coat/Build Prototype Scene")]
         public static void Build(){
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -35,11 +35,7 @@ namespace FinalCoat.EditorTools{
                     "This replaces " + ScenePath + ". Anything changed by hand in that scene will be lost.",
                     "Rebuild", "Cancel"))
                 return;
-            EnsureFolder(SpriteFolder);
-            EnsureFolder(SceneFolder);
-            square = MakeSprite("Square", 32, false);
-            circle = MakeSprite("Circle", 64, true);
-            if (!LoadArt()) return;
+            if (!Prepare()) return;
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             var level = new GameObject("Level").transform;
             var props = new GameObject("Props").transform;
@@ -73,6 +69,14 @@ namespace FinalCoat.EditorTools{
             AddToBuildSettings(ScenePath);
             Selection.activeGameObject = managers;
             Debug.Log("Final Coat: prototype scene built at " + ScenePath + ". Press Play.");
+        }
+
+        internal static bool Prepare(){
+            EnsureFolder(SpriteFolder);
+            EnsureFolder(SceneFolder);
+            square = MakeSprite("Square", 32, false);
+            circle = MakeSprite("Circle", 64, true);
+            return LoadArt();
         }
 
         static void BuildLevel(Transform parent){
@@ -179,7 +183,7 @@ namespace FinalCoat.EditorTools{
             return sprite;
         }
 
-        static ToyController MakeToy(int index, Vector2 position, Color paint, ControlScheme controls, Transform parent){
+        internal static ToyController MakeToy(int index, Vector2 position, Color paint, ControlScheme controls, Transform parent){
             var go = new GameObject($"Player {index + 1}");
             go.transform.SetParent(parent, false);
             go.transform.position = position;
@@ -209,7 +213,7 @@ namespace FinalCoat.EditorTools{
             return toy;
         }
 
-        static void MakeWindUp(string name, Vector2 position, float patrolDistance, Sprite bodyArt, Sprite keyArt, Vector2 keyOffset, float scale, Vector2 colliderSize, Transform parent){
+        internal static void MakeWindUp(string name, Vector2 position, float patrolDistance, Sprite bodyArt, Sprite keyArt, Vector2 keyOffset, float scale, Vector2 colliderSize, Transform parent){
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
             go.transform.position = position;
@@ -240,7 +244,7 @@ namespace FinalCoat.EditorTools{
             enemy.patrolDistance = patrolDistance;
         }
 
-        static PaintBlob MakeBlob(string name, Vector2 position, BlobKind kind, int value, Color color, float size, Transform parent){
+        internal static PaintBlob MakeBlob(string name, Vector2 position, BlobKind kind, int value, Color color, float size, Transform parent){
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
             go.transform.position = position;
@@ -276,7 +280,7 @@ namespace FinalCoat.EditorTools{
             crate.AddComponent<Respawnable>();
         }
 
-        static void MakeCamera(){
+        internal static void MakeCamera(){
             var go = new GameObject("Main Camera");
             go.tag = "MainCamera";
             go.transform.position = new Vector3(-4f, 2f, -10f);
@@ -291,7 +295,7 @@ namespace FinalCoat.EditorTools{
             follow.maxSize = 6.5f;
         }
 
-        static GameObject Box(string name, Vector2 center, Vector2 size, Color color, Transform parent, int order = 0, bool withCollider = true){
+        internal static GameObject Box(string name, Vector2 center, Vector2 size, Color color, Transform parent, int order = 0, bool withCollider = true){
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
             go.transform.position = center;
@@ -304,7 +308,7 @@ namespace FinalCoat.EditorTools{
             return go;
         }
 
-        static SpriteRenderer Shape(string name, Sprite sprite, Transform parent, Vector2 localPosition, Vector2 size, Color color, int order){
+        internal static SpriteRenderer Shape(string name, Sprite sprite, Transform parent, Vector2 localPosition, Vector2 size, Color color, int order){
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
             Vector3 ps = parent.lossyScale;

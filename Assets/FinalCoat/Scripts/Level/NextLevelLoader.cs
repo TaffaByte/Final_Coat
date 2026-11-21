@@ -5,6 +5,7 @@ namespace FinalCoat{
     public class NextLevelLoader : MonoBehaviour{
         public string nextSceneName = "Level2";
         public float delay = 4f;
+        public bool dropIntoNextLevel;
         float loadAt = -1f;
         GUIStyle style;
         void OnEnable() => GameEvents.LevelCompleted += OnLevelCompleted;
@@ -18,6 +19,7 @@ namespace FinalCoat{
             if (loadAt < 0f || Time.unscaledTime < loadAt) return;
             loadAt = -1f;
             Time.timeScale = 1f;
+            if (dropIntoNextLevel) GameSettings.DropInNextScene = true;
             SceneManager.LoadScene(nextSceneName);
         }
 

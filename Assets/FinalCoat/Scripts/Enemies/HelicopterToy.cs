@@ -27,6 +27,7 @@ namespace FinalCoat{
         public SpriteRenderer bodyRenderer;
         public Color calmColor = Color.white;
         public Color alertColor = new Color(1f, 0.72f, 0.72f);
+        public float sizeBoost = 1.3f;
         [Header("Debug")]
         public bool showStateLabel = true;
         public Rigidbody2D Body { get; private set; }
@@ -57,7 +58,13 @@ namespace FinalCoat{
             spawnPoint = transform.position;
             Home = spawnPoint;
             solidOnly = new ContactFilter2D { useTriggers = false };
-            if (body != null) bodyBaseScale = body.localScale;
+            if (body != null){
+                body.localScale *= sizeBoost;
+                bodyBaseScale = body.localScale;
+            }
+            var box = GetComponent<BoxCollider2D>();
+            box.size *= sizeBoost;
+            box.offset *= sizeBoost;
             if (blades != null) bladesBaseScale = blades.localScale;
             if (bodyRenderer != null) bodyRenderer.color = calmColor;
             Patrol = new HeliPatrolState(this);
